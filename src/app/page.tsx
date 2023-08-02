@@ -52,7 +52,7 @@ export default function TaskApp() {
     }
 
     return (
-        <div className='todoapp stack-large'>
+        <div className='todoapp stack-large dark:bg-neutral-900'>
             <h1>To Do List</h1>
             <AddTodo
                 onAddTodo={handleAddTodo}
