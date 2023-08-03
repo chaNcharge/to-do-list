@@ -1,19 +1,41 @@
 'use client';
 
 import { useImmer } from 'use-immer';
+import { useState } from 'react';
 import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
+import FilterButton from './components/FilterButton';
+
+export interface Todo {
+    id: number;
+    title: string;
+    done: boolean;
+}
+
+export interface FilterMap {
+    [key: string]: (todo: Todo) => boolean;
+}
 
 let nextId = 3;
-const initialTodos = [
+
+const initialTodos: Todo[] = [
     { id: 0, title: 'Buy milk', done: true },
     { id: 1, title: 'Eat tacos', done: false },
     { id: 2, title: 'Brew tea', done: false },
 ];
 
+const FILTER_MAP: FilterMap = {
+    All: () => true,
+    Active: (todo: { done: boolean; }) => !todo.done,
+    Completed: (todo: { done: boolean; }) => todo.done,
+};
+
+const FILTER_NAMES: string[] = Object.keys(FILTER_MAP);
+
 export default function TaskApp() {
     const [todos, updateTodos] = useImmer(initialTodos);
     const [highlightedId, setHighlightedId] = useImmer<number | null>(null);
+    const [filter, setFilter] = useState("All");
 
     function handleAddTodo(title: string) {
         updateTodos(draft => {
@@ -57,12 +79,19 @@ export default function TaskApp() {
             <AddTodo
                 onAddTodo={handleAddTodo}
             />
+            <div className='filters btn-group stack-exception'>
+                {FILTER_NAMES.map(name => (
+                    <FilterButton key={name} name={name} setFilter={setFilter} />
+                ))}
+            </div>
             <TaskList
                 todos={todos}
                 onChangeTodo={handleChangeTodo}
                 onDeleteTodo={handleDeleteTodo}
                 highlightedId={highlightedId}
                 onHover={handleHover}
+                filter={filter}
+                filterMap={FILTER_MAP}
             />
         </div>
     );

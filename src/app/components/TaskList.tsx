@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import styles from '../styles/todolist.module.css'
+import { FilterMap, Todo } from '../page';
 
 export default function TaskList({
     todos,
     onChangeTodo,
     onDeleteTodo,
     highlightedId,
-    onHover
+    onHover,
+    filter,
+    filterMap
 }: {
-    todos: { id: number; title: string; done: boolean; }[];
+    todos: Todo[];
     onChangeTodo: (nextTodo: { id: number; title: string; done: boolean; }) => void;
     onDeleteTodo: (todoId: number) => void;
     highlightedId: number | null;
     onHover: (todoId: number | null) => void;
+    filter: string;
+    filterMap: FilterMap;
 }) {
     return (
         <ul
@@ -20,7 +25,9 @@ export default function TaskList({
             className='todo-list stack-large stack-exception'
             aria-labelledby='list-heading'
         >
-            {todos.map(todo => (
+            {todos
+            .filter(filterMap[filter])
+            .map(todo => (
                 <li key={todo.id}
                     className={`todo stack-small ${todo.id === highlightedId ? styles.highlighted : ''}`}
                     onFocus={() => {

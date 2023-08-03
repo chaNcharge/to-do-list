@@ -6,20 +6,20 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'To-Do List',
-  description: 'A to-do list written in React and Next.js',
+    title: 'To-Do List',
+    description: 'A to-do list written in React and Next.js',
 }
 
 export default function RootLayout({
-  children,
+    children,
 }: {
-  children: React.ReactNode
+    children: React.ReactNode
 }) {
-  return (
-    <html lang="en">
-      <body className={`dark:bg-black ${inter.className}`}>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
-  )
+    return (
+        <html lang="en">
+            <body className={`dark:bg-black ${inter.className}`}>
+                <Providers>{children}</Providers>
+            </body>
+        </html>
+    )
 }
