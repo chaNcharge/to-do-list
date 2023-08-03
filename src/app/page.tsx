@@ -81,7 +81,7 @@ export default function TaskApp() {
             />
             <div className='filters btn-group stack-exception'>
                 {FILTER_NAMES.map(name => (
-                    <FilterButton key={name} name={name} setFilter={setFilter} />
+                    <FilterButton key={name} name={name} setFilter={setFilter} isPressed={name === filter} />
                 ))}
             </div>
             <TaskList

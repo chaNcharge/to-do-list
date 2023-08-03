@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import styles from '../styles/todolist.module.css'
 import { FilterMap, Todo } from '../page';
 
 export default function TaskList({
@@ -29,7 +28,7 @@ export default function TaskList({
             .filter(filterMap[filter])
             .map(todo => (
                 <li key={todo.id}
-                    className={`todo stack-small ${todo.id === highlightedId ? styles.highlighted : ''}`}
+                    className={`todo stack-small ${todo.id === highlightedId ? 'bg-sky-100 dark:bg-neutral-700' : ''}`}
                     onFocus={() => {
                         onHover(todo.id);
                     }}
