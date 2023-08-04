@@ -1,10 +1,11 @@
 'use client';
 
 import { useImmer } from 'use-immer';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
+import { getLocalStorage } from './lib/LocalStorage';
 
 export interface Todo {
     id: number;
@@ -16,13 +17,10 @@ export interface FilterMap {
     [key: string]: (todo: Todo) => boolean;
 }
 
-let nextId = 3;
+const localStorageTodoArray: Todo[] = getLocalStorage("todos");
+const initialTodos: Todo[] = []
 
-const initialTodos: Todo[] = [
-    { id: 0, title: 'Buy milk', done: true },
-    { id: 1, title: 'Eat tacos', done: false },
-    { id: 2, title: 'Brew tea', done: false },
-];
+let nextId = localStorageTodoArray.length;
 
 const FILTER_MAP: FilterMap = {
     All: () => true,
@@ -36,6 +34,14 @@ export default function TaskApp() {
     const [todos, updateTodos] = useImmer(initialTodos);
     const [highlightedId, setHighlightedId] = useImmer<number | null>(null);
     const [filter, setFilter] = useState("All");
+
+    useEffect(() => {
+        updateTodos(localStorageTodoArray.map((todo, index) => ({
+            ...todo,
+            id: index,
+        })));
+        console.log("loaded from localStorage");
+    }, [updateTodos]);
 
     function handleAddTodo(title: string) {
         updateTodos(draft => {

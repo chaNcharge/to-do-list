@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FilterMap, Todo } from '../page';
+import { saveToLocalStorage } from '../lib/LocalStorage';
 
 export default function TaskList({
     todos,
@@ -18,6 +19,11 @@ export default function TaskList({
     filter: string;
     filterMap: FilterMap;
 }) {
+    useEffect(() => {
+        saveToLocalStorage("todos", todos);
+        console.log("saving to localStorage");
+    }, [todos])
+
     return (
         <ul
             role='list'
@@ -25,26 +31,26 @@ export default function TaskList({
             aria-labelledby='list-heading'
         >
             {todos
-            .filter(filterMap[filter])
-            .map(todo => (
-                <li key={todo.id}
-                    className={`todo stack-small ${todo.id === highlightedId ? 'bg-sky-100 dark:bg-neutral-700' : ''}`}
-                    onFocus={() => {
-                        onHover(todo.id);
-                    }}
-                    onPointerMove={() => {
-                        onHover(todo.id);
-                    }}
-                    onPointerLeave={() => {
-                        onHover(null);
-                    }}>
-                    <Task
-                        todo={todo}
-                        onChange={onChangeTodo}
-                        onDelete={onDeleteTodo}
-                    />
-                </li>
-            ))}
+                .filter(filterMap[filter])
+                .map(todo => (
+                    <li key={todo.id}
+                        className={`todo stack-small ${todo.id === highlightedId ? 'bg-sky-100 dark:bg-neutral-700' : ''}`}
+                        onFocus={() => {
+                            onHover(todo.id);
+                        }}
+                        onPointerMove={() => {
+                            onHover(todo.id);
+                        }}
+                        onPointerLeave={() => {
+                            onHover(null);
+                        }}>
+                        <Task
+                            todo={todo}
+                            onChange={onChangeTodo}
+                            onDelete={onDeleteTodo}
+                        />
+                    </li>
+                ))}
         </ul>
     );
 }
@@ -62,8 +68,8 @@ function Task({
     let todoContent: JSX.Element;
     if (isEditing) {
         todoContent = (
-            <form 
-                className='stack-small' 
+            <form
+                className='stack-small'
                 onSubmit={e => {
                     e.preventDefault();
                     setIsEditing(false);
