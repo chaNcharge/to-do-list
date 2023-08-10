@@ -358,3 +358,11 @@ body {
 .c-cb>input[type="checkbox"]:checked+label::after {
     opacity: 1;
 }
+
+#storage-login {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+}

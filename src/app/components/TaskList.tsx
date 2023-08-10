@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FilterMap, Todo } from '../page';
-import { saveToLocalStorage } from '../lib/LocalStorage';
+import { saveToRemoteStorage } from '../lib/RemoteStorage';
 
 export default function TaskList({
     todos,
@@ -20,8 +20,9 @@ export default function TaskList({
     filterMap: FilterMap;
 }) {
     useEffect(() => {
-        saveToLocalStorage("todos", todos);
-        console.log("saving to localStorage");
+        //saveToLocalStorage("todos", todos);
+        //console.log("saving to localStorage");
+        saveToRemoteStorage(todos);
     }, [todos])
 
     return (

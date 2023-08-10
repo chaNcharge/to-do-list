@@ -5,7 +5,9 @@ import { useEffect, useState } from 'react';
 import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
-import { getLocalStorage } from './lib/LocalStorage';
+import RemoteStorage from 'remotestoragejs';
+import Widget from 'remotestorage-widget';
+import { Todos } from './lib/RemoteStorage-module';
 
 export interface Todo {
     id: number;
@@ -17,10 +19,15 @@ export interface FilterMap {
     [key: string]: (todo: Todo) => boolean;
 }
 
-const localStorageTodoArray: Todo[] = getLocalStorage("todos");
+// All todos stored in JSON format under 'todos' key
+
+export const remoteStorage = new RemoteStorage({ logging: true, modules: [Todos] });
+const widget = new Widget(remoteStorage);
+
+const remoteStorageTodoArray: Todo[] = []; 
 const initialTodos: Todo[] = []
 
-let nextId = localStorageTodoArray.length;
+let nextId = remoteStorageTodoArray.length;
 
 const FILTER_MAP: FilterMap = {
     All: () => true,
@@ -36,11 +43,28 @@ export default function TaskApp() {
     const [filter, setFilter] = useState("All");
 
     useEffect(() => {
-        updateTodos(localStorageTodoArray.map((todo, index) => ({
+        remoteStorage.access.claim('to-do-list', 'rw');
+        remoteStorage.caching.enable('/to-do-list/');
+
+        widget.attach("storage-login");
+
+        remoteStorage.on('connected', () => {
+            const userAddress = remoteStorage.remote.userAddress;
+            console.debug(`${userAddress} connected their remote storage.`);
+        })
+
+        remoteStorage.on('network-offline', () => {
+            console.debug(`We're offline now.`);
+        })
+
+        remoteStorage.on('network-online', () => {
+            console.debug(`Hooray, we're back online.`);
+        })
+
+        updateTodos(remoteStorageTodoArray.map((todo, index) => ({
             ...todo,
             id: index,
         })));
-        console.log("loaded from localStorage");
     }, [updateTodos]);
 
     function handleAddTodo(title: string) {
@@ -80,25 +104,28 @@ export default function TaskApp() {
     }
 
     return (
-        <div className='todoapp stack-large dark:bg-neutral-900'>
-            <h1>To Do List</h1>
-            <AddTodo
-                onAddTodo={handleAddTodo}
-            />
-            <div className='filters btn-group stack-exception'>
-                {FILTER_NAMES.map(name => (
-                    <FilterButton key={name} name={name} setFilter={setFilter} isPressed={name === filter} />
-                ))}
+        <>
+            <div id='storage-login'>Login to remoteStorage</div>
+            <div className='todoapp stack-large dark:bg-neutral-900'>
+                <h1>To Do List</h1>
+                <AddTodo
+                    onAddTodo={handleAddTodo}
+                />
+                <div className='filters btn-group stack-exception'>
+                    {FILTER_NAMES.map(name => (
+                        <FilterButton key={name} name={name} setFilter={setFilter} isPressed={name === filter} />
+                    ))}
+                </div>
+                <TaskList
+                    todos={todos}
+                    onChangeTodo={handleChangeTodo}
+                    onDeleteTodo={handleDeleteTodo}
+                    highlightedId={highlightedId}
+                    onHover={handleHover}
+                    filter={filter}
+                    filterMap={FILTER_MAP}
+                />
             </div>
-            <TaskList
-                todos={todos}
-                onChangeTodo={handleChangeTodo}
-                onDeleteTodo={handleDeleteTodo}
-                highlightedId={highlightedId}
-                onHover={handleHover}
-                filter={filter}
-                filterMap={FILTER_MAP}
-            />
-        </div>
+        </>
     );
 }
