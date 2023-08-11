@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FilterMap, Todo } from '../page';
 import { saveToRemoteStorage } from '../lib/RemoteStorage';
+import RemoteStorage from 'remotestoragejs';
 
 export default function TaskList({
     todos,
@@ -9,7 +10,8 @@ export default function TaskList({
     highlightedId,
     onHover,
     filter,
-    filterMap
+    filterMap,
+    remoteStorage
 }: {
     todos: Todo[];
     onChangeTodo: (nextTodo: { id: number; title: string; done: boolean; }) => void;
@@ -18,12 +20,13 @@ export default function TaskList({
     onHover: (todoId: number | null) => void;
     filter: string;
     filterMap: FilterMap;
+    remoteStorage: RemoteStorage;
 }) {
     useEffect(() => {
         //saveToLocalStorage("todos", todos);
         //console.log("saving to localStorage");
-        saveToRemoteStorage(todos);
-    }, [todos])
+        saveToRemoteStorage(todos, remoteStorage);
+    }, [todos, remoteStorage])
 
     return (
         <ul

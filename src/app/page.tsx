@@ -21,7 +21,7 @@ export interface FilterMap {
 
 // All todos stored in JSON format under 'todos' key
 
-export const remoteStorage = new RemoteStorage({ logging: true, modules: [Todos] });
+const remoteStorage = new RemoteStorage({ logging: true, modules: [Todos] });
 const widget = new Widget(remoteStorage);
 
 const remoteStorageTodoArray: Todo[] = []; 
@@ -105,7 +105,6 @@ export default function TaskApp() {
 
     return (
         <>
-            <div id='storage-login'>Login to remoteStorage</div>
             <div className='todoapp stack-large dark:bg-neutral-900'>
                 <h1>To Do List</h1>
                 <AddTodo
@@ -124,7 +123,14 @@ export default function TaskApp() {
                     onHover={handleHover}
                     filter={filter}
                     filterMap={FILTER_MAP}
+                    remoteStorage={remoteStorage}
                 />
+            </div>
+            <div 
+                id="storage-login" 
+                className="flex flex-col items-center justify-center border p-6"
+            >
+                Log in to remoteStorage
             </div>
         </>
     );

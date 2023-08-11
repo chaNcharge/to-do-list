@@ -1,7 +1,8 @@
-import { Todo, remoteStorage } from "../page";
+import RemoteStorage from "remotestoragejs";
+import { Todo } from "../page";
 
 
-export function saveToRemoteStorage(data: Todo[]) {
+export function saveToRemoteStorage(data: Todo[], remoteStorage: RemoteStorage) {
     remoteStorage.todos.saveToRemoteStorage({todosData: data});
 }
 
