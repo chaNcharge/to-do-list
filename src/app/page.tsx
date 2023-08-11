@@ -7,6 +7,7 @@ import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
 import RemoteStorage from 'remotestoragejs';
 import { Todos } from './lib/RemoteStorage-module';
+import dynamic from 'next/dynamic';
 
 export interface Todo {
     id: number;
@@ -21,6 +22,9 @@ export interface FilterMap {
 // All todos stored in JSON format under 'todos' key
 
 const remoteStorage = new RemoteStorage({ logging: true, modules: [Todos] });
+const RemoteStorageWidget = dynamic(() => import("./components/RemoteStorageWidget"), {
+    ssr: false
+});
 
 // TODO: load from remoteStorage here?
 const remoteStorageTodoArray: Todo[] = []; 
@@ -44,14 +48,6 @@ export default function TaskApp() {
     useEffect(() => {
         remoteStorage.access.claim('to-do-list', 'rw');
         remoteStorage.caching.enable('/to-do-list/');
-
-        const initWidget = async () => {
-            const { default: Widget } = await import('remotestorage-widget');
-            const widget = new Widget(remoteStorage);
-            widget.attach("storage-login");
-        }
-
-        initWidget();
 
         remoteStorage.on('connected', () => {
             const userAddress = remoteStorage.remote.userAddress;
@@ -136,6 +132,10 @@ export default function TaskApp() {
                 className="flex flex-col items-center justify-center border p-6"
             >
                 Log in to remoteStorage
+                <RemoteStorageWidget 
+                    remoteStorage={remoteStorage}
+                    elementId='storage-login'
+                />
             </div>
         </>
     );
