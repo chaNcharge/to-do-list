@@ -79,6 +79,7 @@ function Task({
             >
                 <div className='form-group'>
                     <input
+                        className='dark:bg-neutral-900'
                         value={todo.title}
                         onChange={e => {
                             onChange({
