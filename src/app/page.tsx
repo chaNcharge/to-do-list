@@ -30,7 +30,6 @@ const RemoteStorageWidget = dynamic(() => import("./components/RemoteStorageWidg
 const remoteStorageTodoPromise = getRemoteStorage(remoteStorage); 
 const initialTodos: Todo[] = []
 
-//let nextId = remoteStorageTodoArray.length;
 let nextId = 0;
 
 const FILTER_MAP: FilterMap = {
@@ -63,20 +62,20 @@ export default function TaskApp() {
             console.debug(`Hooray, we're back online.`);
         })
 
-        remoteStorageTodoPromise.then(remoteStorageTodoArray => {
-            // Here, remoteStorageTodoArray will contain the resolved JSON object
-            console.log("Remote storage object:", remoteStorageTodoArray);
-            console.log(typeof remoteStorageTodoArray)
+        remoteStorageTodoPromise.then(remoteStorageTodoObject => {
+            console.debug("Remote storage object:", remoteStorageTodoObject);
+
+            const remoteStorageTodoArray: Todo[] = remoteStorageTodoObject.todosData;
+            console.debug(remoteStorageTodoArray);
+
+            nextId = remoteStorageTodoArray.length;
+            updateTodos(remoteStorageTodoArray.map((todo, index) => ({
+                ...todo,
+                id: index,
+            })));
         }).catch(error => {
-            console.error("Error:", error);
+            console.warn("Error loading from remoteStorage (possibly just empty and intentional):", error);
         });
-        // TODO: Implement loading onto page, experiment with server components
-        /*
-        updateTodos(remoteStorageTodoArray.map((todo, index) => ({
-            ...todo,
-            id: index,
-        })));
-        */
     }, [updateTodos]);
 
     function handleAddTodo(title: string) {

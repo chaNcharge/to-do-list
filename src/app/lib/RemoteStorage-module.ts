@@ -15,13 +15,13 @@ export const Todos = {
         return {
             exports: {
                 saveToRemoteStorage: async function (data: Todo[]) {
-                    await privateClient.storeObject("TodoData", "to-do-list", data)
-                        .then(() => console.log("saved to remoteStorage"))
+                    await privateClient.storeObject("TodoData", "todo-data", data)
+                        .then(() => console.debug("saved to remoteStorage"))
                         .catch(error => console.error("Error saving to remoteStorage", error));
                 },
                 
                 loadRemoteStorage: async function () {
-                    return privateClient.getObject("to-do-list")
+                    return await privateClient.getObject("todo-data")
                         .then(result => {
                             return result;
                         })

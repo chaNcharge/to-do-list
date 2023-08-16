@@ -23,8 +23,6 @@ export default function TaskList({
     remoteStorage: RemoteStorage;
 }) {
     useEffect(() => {
-        //saveToLocalStorage("todos", todos);
-        //console.log("saving to localStorage");
         saveToRemoteStorage(todos, remoteStorage);
     }, [todos, remoteStorage])
 

@@ -6,13 +6,13 @@ export function saveToRemoteStorage(data: Todo[], remoteStorage: RemoteStorage &
     remoteStorage.todos.saveToRemoteStorage({todosData: data});
 }
 
-export async function getRemoteStorage(remoteStorage: RemoteStorage & Record<string, any>): Promise<unknown> {
+export async function getRemoteStorage(remoteStorage: RemoteStorage & Record<string, any>): Promise<any> {
     return remoteStorage.todos.loadRemoteStorage()
         .then((obj: object) => {
             if (obj !== null) {
                 return obj;
             } else {
-                console.log("Remote storage object not found!");
+                console.error("Remote storage object not found!");
             }
         })
 }
