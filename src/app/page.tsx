@@ -8,6 +8,7 @@ import FilterButton from './components/FilterButton';
 import RemoteStorage from 'remotestoragejs';
 import { Todos } from './lib/RemoteStorage-module';
 import dynamic from 'next/dynamic';
+import { getRemoteStorage } from './lib/RemoteStorage';
 
 export interface Todo {
     id: number;
@@ -26,11 +27,11 @@ const RemoteStorageWidget = dynamic(() => import("./components/RemoteStorageWidg
     ssr: false
 });
 
-// TODO: load from remoteStorage here?
-const remoteStorageTodoArray: Todo[] = []; 
+const remoteStorageTodoPromise = getRemoteStorage(remoteStorage); 
 const initialTodos: Todo[] = []
 
-let nextId = remoteStorageTodoArray.length;
+//let nextId = remoteStorageTodoArray.length;
+let nextId = 0;
 
 const FILTER_MAP: FilterMap = {
     All: () => true,
@@ -62,10 +63,20 @@ export default function TaskApp() {
             console.debug(`Hooray, we're back online.`);
         })
 
+        remoteStorageTodoPromise.then(remoteStorageTodoArray => {
+            // Here, remoteStorageTodoArray will contain the resolved JSON object
+            console.log("Remote storage object:", remoteStorageTodoArray);
+            console.log(typeof remoteStorageTodoArray)
+        }).catch(error => {
+            console.error("Error:", error);
+        });
+        // TODO: Implement loading onto page, experiment with server components
+        /*
         updateTodos(remoteStorageTodoArray.map((todo, index) => ({
             ...todo,
             id: index,
         })));
+        */
     }, [updateTodos]);
 
     function handleAddTodo(title: string) {
