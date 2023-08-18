@@ -32,6 +32,16 @@ html {
     font: 62.5% / 1.15 sans-serif;
 }
 
+a {
+    color: skyblue;
+    text-decoration: underline;
+}
+
+a:hover {
+    color: deepskyblue;
+    text-decoration: none;
+}
+
 h1,
 h2 {
     margin-bottom: 0;
@@ -100,6 +110,8 @@ body {
 .form-group>input[type="text"] {
     display: inline-block;
     margin-top: 0.4rem;
+    background-color: transparent;
+    outline: none;
 }
 
 .btn {
@@ -111,6 +123,10 @@ body {
 
 .dark .btn {
     @apply bg-neutral-700;
+}
+
+.dark .btn:hover {
+    @apply bg-neutral-500;
 }
 
 .btn.toggle-btn {

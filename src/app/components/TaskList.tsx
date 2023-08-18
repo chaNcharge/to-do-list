@@ -7,16 +7,12 @@ export default function TaskList({
     todos,
     onChangeTodo,
     onDeleteTodo,
-    highlightedId,
-    onHover,
     filter,
     filterMap,
 }: {
     todos: Todo[];
     onChangeTodo: (nextTodo: { id: number; title: string; done: boolean; }) => void;
     onDeleteTodo: (todoId: number) => void;
-    highlightedId: number | null;
-    onHover: (todoId: number | null) => void;
     filter: string;
     filterMap: FilterMap;
 }) {
@@ -39,17 +35,10 @@ export default function TaskList({
             {todos
                 .filter(filterMap[filter])
                 .map(todo => (
-                    <li key={todo.id}
-                        className={`todo stack-small ${todo.id === highlightedId ? 'bg-sky-100 dark:bg-neutral-700' : ''}`}
-                        onFocus={() => {
-                            onHover(todo.id);
-                        }}
-                        onPointerMove={() => {
-                            onHover(todo.id);
-                        }}
-                        onPointerLeave={() => {
-                            onHover(null);
-                        }}>
+                    <li 
+                        key={todo.id}
+                        className={`todo stack-small hover:bg-sky-100 hover:dark:bg-neutral-700`}
+                    >
                         <Task
                             todo={todo}
                             onChange={onChangeTodo}
@@ -71,6 +60,14 @@ function Task({
     onDelete: (todoId: number) => void;
 }) {
     const [isEditing, setIsEditing] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        if (isEditing && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isEditing]);
+    
     let todoContent: JSX.Element;
     if (isEditing) {
         todoContent = (
@@ -83,7 +80,8 @@ function Task({
             >
                 <div className='form-group'>
                     <input
-                        className='dark:bg-neutral-900'
+                        type='text'
+                        ref={inputRef}
                         value={todo.title}
                         onChange={e => {
                             onChange({

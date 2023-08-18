@@ -1,7 +1,7 @@
 'use client';
 
 import { useImmer } from 'use-immer';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
@@ -19,12 +19,6 @@ export interface FilterMap {
     [key: string]: (todo: Todo) => boolean;
 }
 
-// All todos stored in JSON format under 'todos' key
-/*
-const RemoteStorageWidget = dynamic(() => import("./components/RemoteStorageWidget"), {
-    ssr: false
-});
-*/
 const initialTodos: Todo[] = []
 
 let nextId = 0;
@@ -39,8 +33,7 @@ const FILTER_NAMES: string[] = Object.keys(FILTER_MAP);
 
 export default function TaskApp() {
     const [todos, updateTodos] = useImmer(initialTodos);
-    const [highlightedId, setHighlightedId] = useImmer<number | null>(null);
-    const [filter, setFilter] = useState("All");
+    const [filter, updateFilter] = useImmer("All");
 
     useEffect(() => {
         async function remoteStartup() {
@@ -100,10 +93,6 @@ export default function TaskApp() {
         })
     }
 
-    function handleHover(todoId: number | null) {
-        setHighlightedId(todoId);
-    }
-
     return (
         <>
             <div className='todoapp stack-large dark:bg-neutral-900'>
@@ -113,15 +102,13 @@ export default function TaskApp() {
                 />
                 <div className='filters btn-group stack-exception'>
                     {FILTER_NAMES.map(name => (
-                        <FilterButton key={name} name={name} setFilter={setFilter} isPressed={name === filter} />
+                        <FilterButton key={name} name={name} setFilter={updateFilter} isPressed={name === filter} />
                     ))}
                 </div>
                 <TaskList
                     todos={todos}
                     onChangeTodo={handleChangeTodo}
                     onDeleteTodo={handleDeleteTodo}
-                    highlightedId={highlightedId}
-                    onHover={handleHover}
                     filter={filter}
                     filterMap={FILTER_MAP}
                 />
@@ -132,12 +119,12 @@ export default function TaskApp() {
             >
                 <h1 className='text-5xl text-center mb-4'>Task synchronization</h1>
                 <p>
-                    You can sync your tasks across different devices. This is powered by 
-                    the <Link href={"https://remotestorage.io/"} className="underline text-blue-500">remoteStorage</Link> protocol 
+                    You can sync your tasks across different devices. This is powered by
+                    the <Link href={"https://remotestorage.io/"}>remoteStorage</Link> protocol
                     and uses a third-party data storage service (which you can also host yourself to have full control over your data).
                 </p>
                 <p>
-                    To get started, create an account with any remotestorage provider. <Link href={"https://5apps.com/storage"} className="underline text-blue-500">5apps</Link> is 
+                    To get started, create an account with any remotestorage provider. <Link href={"https://5apps.com/storage"}>5apps</Link> is
                     recommended since it&apos;s free.
                 </p>
                 <p>
