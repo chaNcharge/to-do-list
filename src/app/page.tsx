@@ -6,6 +6,7 @@ import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
 import { getRemoteStorage, initRemote } from './lib/RemoteStorage';
+import Link from 'next/link';
 
 
 export interface Todo {
@@ -126,10 +127,23 @@ export default function TaskApp() {
                 />
             </div>
             <div
-                id="storage-login"
-                className="flex flex-col items-center justify-center border p-6"
+                id="storage-info"
+                className="flex flex-col border p-6 text-left text-2xl space-y-6"
             >
-                Log in to remoteStorage
+                <h1 className='text-5xl text-center mb-4'>Task synchronization</h1>
+                <p>
+                    You can sync your tasks across different devices. This is powered by 
+                    the <Link href={"https://remotestorage.io/"} className="underline text-blue-500">remoteStorage</Link> protocol 
+                    and uses a third-party data storage service (which you can also host yourself to have full control over your data).
+                </p>
+                <p>
+                    To get started, create an account with any remotestorage provider. <Link href={"https://5apps.com/storage"} className="underline text-blue-500">5apps</Link> is 
+                    recommended since it&apos;s free.
+                </p>
+                <p>
+                    Once you&apos;ve created an account (eg. user@5apps.com), log in below:
+                </p>
+                <div id='storage-login' className='flex justify-center'></div>
             </div>
         </>
     );
