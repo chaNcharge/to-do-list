@@ -5,10 +5,8 @@ import { useEffect, useState } from 'react';
 import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
-import RemoteStorage from 'remotestoragejs';
-import { Todos } from './lib/RemoteStorage-module';
-import dynamic from 'next/dynamic';
-import { getRemoteStorage } from './lib/RemoteStorage';
+import { getRemoteStorage, initRemote } from './lib/RemoteStorage';
+
 
 export interface Todo {
     id: number;
@@ -21,13 +19,11 @@ export interface FilterMap {
 }
 
 // All todos stored in JSON format under 'todos' key
-
-const remoteStorage = new RemoteStorage({ logging: true, modules: [Todos] });
+/*
 const RemoteStorageWidget = dynamic(() => import("./components/RemoteStorageWidget"), {
     ssr: false
 });
-
-const remoteStorageTodoPromise = getRemoteStorage(remoteStorage); 
+*/
 const initialTodos: Todo[] = []
 
 let nextId = 0;
@@ -46,36 +42,29 @@ export default function TaskApp() {
     const [filter, setFilter] = useState("All");
 
     useEffect(() => {
-        remoteStorage.access.claim('to-do-list', 'rw');
-        remoteStorage.caching.enable('/to-do-list/');
+        async function remoteStartup() {
+            const remoteStorage = await initRemote();
+            const { default: Widget } = await import('remotestorage-widget');
+            new Widget(remoteStorage).attach("storage-login");
+            try {
+                const remoteStorageTodoObject = await getRemoteStorage();
 
-        remoteStorage.on('connected', () => {
-            const userAddress = remoteStorage.remote.userAddress;
-            console.debug(`${userAddress} connected their remote storage.`);
-        })
+                console.debug("Remote storage object:", remoteStorageTodoObject);
 
-        remoteStorage.on('network-offline', () => {
-            console.debug(`We're offline now.`);
-        })
+                const remoteStorageTodoArray: Todo[] = remoteStorageTodoObject.todosData;
+                console.debug(remoteStorageTodoArray);
 
-        remoteStorage.on('network-online', () => {
-            console.debug(`Hooray, we're back online.`);
-        })
+                nextId = remoteStorageTodoArray.length;
+                updateTodos(remoteStorageTodoArray.map((todo, index) => ({
+                    ...todo,
+                    id: index,
+                })));
+            } catch (error) {
+                console.warn("Error loading from remoteStorage (possibly just empty and intentional):", error);
+            }
+        }
 
-        remoteStorageTodoPromise.then(remoteStorageTodoObject => {
-            console.debug("Remote storage object:", remoteStorageTodoObject);
-
-            const remoteStorageTodoArray: Todo[] = remoteStorageTodoObject.todosData;
-            console.debug(remoteStorageTodoArray);
-
-            nextId = remoteStorageTodoArray.length;
-            updateTodos(remoteStorageTodoArray.map((todo, index) => ({
-                ...todo,
-                id: index,
-            })));
-        }).catch(error => {
-            console.warn("Error loading from remoteStorage (possibly just empty and intentional):", error);
-        });
+        remoteStartup();
     }, [updateTodos]);
 
     function handleAddTodo(title: string) {
@@ -134,18 +123,13 @@ export default function TaskApp() {
                     onHover={handleHover}
                     filter={filter}
                     filterMap={FILTER_MAP}
-                    remoteStorage={remoteStorage}
                 />
             </div>
-            <div 
-                id="storage-login" 
+            <div
+                id="storage-login"
                 className="flex flex-col items-center justify-center border p-6"
             >
                 Log in to remoteStorage
-                <RemoteStorageWidget 
-                    remoteStorage={remoteStorage}
-                    elementId='storage-login'
-                />
             </div>
         </>
     );
