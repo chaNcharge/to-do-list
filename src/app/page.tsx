@@ -1,11 +1,13 @@
 'use client';
 
 import { useImmer } from 'use-immer';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
-import { getLocalStorage } from './lib/LocalStorage';
+import { getRemoteStorage, initRemote } from './lib/RemoteStorage';
+import Link from 'next/link';
+
 
 export interface Todo {
     id: number;
@@ -17,10 +19,9 @@ export interface FilterMap {
     [key: string]: (todo: Todo) => boolean;
 }
 
-const localStorageTodoArray: Todo[] = getLocalStorage("todos");
 const initialTodos: Todo[] = []
 
-let nextId = localStorageTodoArray.length;
+let nextId = 0;
 
 const FILTER_MAP: FilterMap = {
     All: () => true,
@@ -32,15 +33,32 @@ const FILTER_NAMES: string[] = Object.keys(FILTER_MAP);
 
 export default function TaskApp() {
     const [todos, updateTodos] = useImmer(initialTodos);
-    const [highlightedId, setHighlightedId] = useImmer<number | null>(null);
-    const [filter, setFilter] = useState("All");
+    const [filter, updateFilter] = useImmer("All");
 
     useEffect(() => {
-        updateTodos(localStorageTodoArray.map((todo, index) => ({
-            ...todo,
-            id: index,
-        })));
-        console.log("loaded from localStorage");
+        async function remoteStartup() {
+            const remoteStorage = await initRemote();
+            const { default: Widget } = await import('remotestorage-widget');
+            new Widget(remoteStorage).attach("storage-login");
+            try {
+                const remoteStorageTodoObject = await getRemoteStorage();
+
+                console.debug("Remote storage object:", remoteStorageTodoObject);
+
+                const remoteStorageTodoArray: Todo[] = remoteStorageTodoObject.todosData;
+                console.debug(remoteStorageTodoArray);
+
+                nextId = remoteStorageTodoArray.length;
+                updateTodos(remoteStorageTodoArray.map((todo, index) => ({
+                    ...todo,
+                    id: index,
+                })));
+            } catch (error) {
+                console.warn("Error loading from remoteStorage (possibly just empty and intentional):", error);
+            }
+        }
+
+        remoteStartup();
     }, [updateTodos]);
 
     function handleAddTodo(title: string) {
@@ -75,30 +93,45 @@ export default function TaskApp() {
         })
     }
 
-    function handleHover(todoId: number | null) {
-        setHighlightedId(todoId);
-    }
-
     return (
-        <div className='todoapp stack-large dark:bg-neutral-900'>
-            <h1>To Do List</h1>
-            <AddTodo
-                onAddTodo={handleAddTodo}
-            />
-            <div className='filters btn-group stack-exception'>
-                {FILTER_NAMES.map(name => (
-                    <FilterButton key={name} name={name} setFilter={setFilter} isPressed={name === filter} />
-                ))}
+        <>
+            <div className='todoapp stack-large dark:bg-neutral-900'>
+                <h1>To Do List</h1>
+                <AddTodo
+                    onAddTodo={handleAddTodo}
+                />
+                <div className='filters btn-group stack-exception'>
+                    {FILTER_NAMES.map(name => (
+                        <FilterButton key={name} name={name} setFilter={updateFilter} isPressed={name === filter} />
+                    ))}
+                </div>
+                <TaskList
+                    todos={todos}
+                    onChangeTodo={handleChangeTodo}
+                    onDeleteTodo={handleDeleteTodo}
+                    filter={filter}
+                    filterMap={FILTER_MAP}
+                />
             </div>
-            <TaskList
-                todos={todos}
-                onChangeTodo={handleChangeTodo}
-                onDeleteTodo={handleDeleteTodo}
-                highlightedId={highlightedId}
-                onHover={handleHover}
-                filter={filter}
-                filterMap={FILTER_MAP}
-            />
-        </div>
+            <div
+                id="storage-info"
+                className="flex flex-col border p-6 text-left text-2xl space-y-6"
+            >
+                <h1 className='text-5xl text-center mb-4'>Task synchronization</h1>
+                <p>
+                    You can sync your tasks across different devices. This is powered by
+                    the <Link href={"https://remotestorage.io/"}>remoteStorage</Link> protocol
+                    and uses a third-party data storage service (which you can also host yourself to have full control over your data).
+                </p>
+                <p>
+                    To get started, create an account with any remotestorage provider. <Link href={"https://5apps.com/storage"}>5apps</Link> is
+                    recommended since it&apos;s free.
+                </p>
+                <p>
+                    Once you&apos;ve created an account (eg. user@5apps.com), log in below:
+                </p>
+                <div id='storage-login' className='flex justify-center'></div>
+            </div>
+        </>
     );
 }
