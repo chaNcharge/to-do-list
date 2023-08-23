@@ -6,7 +6,6 @@ import AddTodo from './components/AddTodo';
 import TaskList from './components/TaskList';
 import FilterButton from './components/FilterButton';
 import { getRemoteStorage, initRemote } from './lib/RemoteStorage';
-import Link from 'next/link';
 
 
 export interface Todo {
@@ -94,44 +93,23 @@ export default function TaskApp() {
     }
 
     return (
-        <>
-            <div className='todoapp stack-large dark:bg-neutral-900'>
-                <h1>To Do List</h1>
-                <AddTodo
-                    onAddTodo={handleAddTodo}
-                />
-                <div className='filters btn-group stack-exception'>
-                    {FILTER_NAMES.map(name => (
-                        <FilterButton key={name} name={name} setFilter={updateFilter} isPressed={name === filter} />
-                    ))}
-                </div>
-                <TaskList
-                    todos={todos}
-                    onChangeTodo={handleChangeTodo}
-                    onDeleteTodo={handleDeleteTodo}
-                    filter={filter}
-                    filterMap={FILTER_MAP}
-                />
+        <div className='todoapp stack-large dark:bg-neutral-900'>
+            <h1>To Do List</h1>
+            <AddTodo
+                onAddTodo={handleAddTodo}
+            />
+            <div className='filters btn-group stack-exception'>
+                {FILTER_NAMES.map(name => (
+                    <FilterButton key={name} name={name} setFilter={updateFilter} isPressed={name === filter} />
+                ))}
             </div>
-            <div
-                id="storage-info"
-                className="flex flex-col border p-6 text-left text-2xl space-y-6"
-            >
-                <h1 className='text-5xl text-center mb-4'>Task synchronization</h1>
-                <p>
-                    You can sync your tasks across different devices. This is powered by
-                    the <Link href={"https://remotestorage.io/"}>remoteStorage</Link> protocol
-                    and uses a third-party data storage service (which you can also host yourself to have full control over your data).
-                </p>
-                <p>
-                    To get started, create an account with any remotestorage provider. <Link href={"https://5apps.com/storage"}>5apps</Link> is
-                    recommended since it&apos;s free.
-                </p>
-                <p>
-                    Once you&apos;ve created an account (eg. user@5apps.com), log in below:
-                </p>
-                <div id='storage-login' className='flex justify-center'></div>
-            </div>
-        </>
+            <TaskList
+                todos={todos}
+                onChangeTodo={handleChangeTodo}
+                onDeleteTodo={handleDeleteTodo}
+                filter={filter}
+                filterMap={FILTER_MAP}
+            />
+        </div>
     );
 }
