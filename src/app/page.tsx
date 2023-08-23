@@ -35,6 +35,7 @@ export default function TaskApp() {
     const [filter, updateFilter] = useImmer("All");
 
     useEffect(() => {
+        // This effect runs only once on first load, inits remoteStorage
         async function remoteStartup() {
             const remoteStorage = await initRemote();
             const { default: Widget } = await import('remotestorage-widget');
@@ -93,8 +94,7 @@ export default function TaskApp() {
     }
 
     return (
-        <div className='todoapp stack-large dark:bg-neutral-900'>
-            <h1>To Do List</h1>
+        <>
             <AddTodo
                 onAddTodo={handleAddTodo}
             />
@@ -110,6 +110,6 @@ export default function TaskApp() {
                 filter={filter}
                 filterMap={FILTER_MAP}
             />
-        </div>
+        </>
     );
 }

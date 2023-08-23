@@ -19,10 +19,14 @@ export default function TaskList({
     const isStorageReady = useRef(false);
 
     useEffect(() => {
+        // This effect runs on first load and any time todos prop updates
         if (!isStorageReady.current) {
+            // Uses a ref variable to prevent saving to remoteStorage on first load,
+            // since remoteStorage is likely not ready when this effect runs on load
             isStorageReady.current = true;
             return;
         }
+        // Saves to remoteStorage when any change is detected in array
         saveToRemoteStorage(todos);
     }, [todos])
 

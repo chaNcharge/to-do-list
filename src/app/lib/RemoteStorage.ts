@@ -3,18 +3,32 @@ import { Todo } from "../page";
 import { Todos } from "./RemoteStorage-module";
 
 
-let remotePromise: Promise<any>;
+let remotePromise: Promise<RemoteStorage & Record<string, any>>;
 
+/**
+ * Saves data to remoteStorage. Stores locally and on user account if connected
+ * @param data The Todo[] array to save to storage
+ */
 export async function saveToRemoteStorage(data: Todo[]) {
     const remoteStorage = await remotePromise;
     await remoteStorage.todos.saveToRemoteStorage({ todosData: data });
 }
 
-export async function getRemoteStorage(): Promise<any> {
+/**
+ * Loads data from remoteStorage.
+ * @returns An object including the array (see module) `{todosData: Todo[]}`
+ */
+export async function getRemoteStorage(): Promise<{todosData: Todo[]}> {
     const remoteStorage = await remotePromise;
     return await remoteStorage.todos.loadRemoteStorage();
 }
 
+/**
+ * Initializes the remoteStorage protocol
+ * 
+ * @returns A promise that becomes the remoteStorage object
+ * to use in the read/write functions
+ */
 export async function initRemote() {
     remotePromise = new Promise((resolve) => {
         const remoteStorage = new RemoteStorage({
@@ -28,6 +42,7 @@ export async function initRemote() {
 
         remoteStorage.on('ready', function () {
             console.info("remoteStorage ready");
+            // Fulfills the promise as a prepared RemoteStorage object
             resolve(remoteStorage);
         });
 

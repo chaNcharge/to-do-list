@@ -19,7 +19,10 @@ export default function RootLayout({
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`dark:bg-black ${inter.className}`}>
-                <Providers>{children}</Providers>
+                <div className='todoapp stack-large dark:bg-neutral-900'>
+                    <h1>To Do List</h1>
+                    <Providers>{children}</Providers>
+                </div>
                 <div
                     id="storage-info"
                     className="flex flex-col border p-6 text-left text-2xl space-y-6"
