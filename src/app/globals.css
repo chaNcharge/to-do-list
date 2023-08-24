@@ -112,6 +112,7 @@ body {
     margin-top: 0.4rem;
     background-color: transparent;
     outline: none;
+    width: 400px;
 }
 
 .btn {
@@ -165,6 +166,20 @@ body {
 
 .btn-group>*+* {
     margin-left: 0.8rem;
+}
+
+.btn-move-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-left: 1rem;
+}
+
+.btn-move {
+    padding: 0;
+    aspect-ratio: 1/1;
+    width: 22px;
+    margin: 1px 0;
 }
 
 .label-wrapper {
@@ -312,6 +327,7 @@ body {
     min-height: 44px;
     padding-left: 40px;
     clear: left;
+    display: flex;
 }
 
 .c-cb>label::before,
@@ -341,6 +357,7 @@ body {
     padding: 8px 15px 5px;
     cursor: pointer;
     touch-action: manipulation;
+    flex-grow: 1;
 }
 
 .c-cb>label::before {

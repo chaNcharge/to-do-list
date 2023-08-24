@@ -7,12 +7,14 @@ export default function TaskList({
     todos,
     onChangeTodo,
     onDeleteTodo,
+    onMoveTodo,
     filter,
     filterMap,
 }: {
     todos: Todo[];
     onChangeTodo: (nextTodo: { id: number; title: string; done: boolean; }) => void;
     onDeleteTodo: (todoId: number) => void;
+    onMoveTodo: (todoId: number, direction: string) => void;
     filter: string;
     filterMap: FilterMap;
 }) {
@@ -47,6 +49,7 @@ export default function TaskList({
                             todo={todo}
                             onChange={onChangeTodo}
                             onDelete={onDeleteTodo}
+                            onMove={onMoveTodo}
                         />
                     </li>
                 ))}
@@ -57,11 +60,13 @@ export default function TaskList({
 function Task({
     todo,
     onChange,
-    onDelete
+    onDelete,
+    onMove
 }: {
     todo: { id: number; title: string; done: boolean; };
     onChange: (nextTodo: { id: number; title: string; done: boolean; }) => void;
     onDelete: (todoId: number) => void;
+    onMove: (todoId: number, direction: string) => void;
 }) {
     const [isEditing, setIsEditing] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +128,14 @@ function Task({
                     <label className='todo-label' htmlFor={todo.id.toString()}>
                         {todo.title}
                     </label>
+                    <div className='btn-move-group'>
+                        <button type='button' className='btn btn-move' onClick={() => onMove(todo.id, "up")}>
+                            &#x25B2;
+                        </button>
+                        <button type='button' className='btn btn-move' onClick={() => onMove(todo.id, "down")}>
+                            &#x25BC;
+                        </button>
+                    </div>
                 </div>
 
                 <div className='btn-group'>

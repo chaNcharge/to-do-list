@@ -86,11 +86,28 @@ export default function TaskApp() {
 
     function handleDeleteTodo(todoId: number) {
         updateTodos(draft => {
-            const index = draft.findIndex(t =>
-                t.id === todoId
-            );
+            const index = draft.findIndex(t => t.id === todoId);
             draft.splice(index, 1);
-        })
+        });
+    }
+
+    function handleMoveTodo(todoId: number, direction: string) {
+        updateTodos(draft => {
+            const todoFromIndex = draft.findIndex(t => t.id === todoId);
+            let todoToIndex: number;
+            if (direction === "up") {
+                todoToIndex = todoFromIndex - 1;
+            } else if (direction === "down") {
+                todoToIndex = todoFromIndex + 1;
+            } else {
+                console.error("Invalid direction, must be up or down.");
+                return;
+            }
+            if (todoToIndex >= draft.length || todoToIndex < 0) {
+                return;
+            }
+            draft.splice(todoToIndex, 0, draft.splice(todoFromIndex, 1)[0]);
+        });
     }
 
     return (
@@ -107,6 +124,7 @@ export default function TaskApp() {
                 todos={todos}
                 onChangeTodo={handleChangeTodo}
                 onDeleteTodo={handleDeleteTodo}
+                onMoveTodo={handleMoveTodo}
                 filter={filter}
                 filterMap={FILTER_MAP}
             />

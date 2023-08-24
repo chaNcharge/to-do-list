@@ -9,6 +9,7 @@ export default function AddTodo({ onAddTodo }: { onAddTodo: (title: string) => v
             onAddTodo(title);
         }}>
             <input
+                type='text'
                 className='input input__lg dark:bg-neutral-800'
                 placeholder="Add todo"
                 value={title}
